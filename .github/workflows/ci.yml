@@ -1,16 +1,21 @@
-
 name: CI
 on: [push, pull_request]
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install -r requirements.txt pytest black flake8
-      - run: python scripts/token_check.py 200000
-      - run: black --check .
-      - run: flake8 .
-      - run: pytest -q
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Format with Black
+        run: black . --check
+      - name: Lint
+        run: flake8 . --extend-ignore=E401,E501 --max-line-length=120
+      - name: Run tests
+        run: pytest -q

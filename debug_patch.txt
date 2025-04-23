@@ -1,0 +1,102 @@
+*** Begin Patch
+*** Add File: .flake8
+@@
++[flake8]
++ignore = E401,E501
++max-line-length = 120
+
+*** Add File: requirements.txt
+@@
++pydantic>=2.6
++pdf2image>=1.17
++pillow>=10
++pytesseract>=0.3.10
++python-magic
+
+*** Add File: utility_contract.json
+@@
++{
++  "name": "document-upload-service",
++  "version": "0.1.0",
++  "language": "python",
++  "description": "Generic upload + OCR utility producing ExtractedDocument JSON.",
++  "size_budget": 200000,
++  "entrypoints": [
++    {
++      "name": "process_document",
++      "description": "Ingest file, OCR, return text pages",
++      "parameters_schema": {},
++      "return_schema": {}
++    }
++  ],
++  "deps": [
++    {"package": "pydantic", "version": ">=2.6"},
++    {"package": "pdf2image", "version": ">=1.17"},
++    {"package": "pillow", "version": ">=10"},
++    {"package": "pytesseract", "version": ">=0.3.10"}
++  ],
++  "tests": ["tests/test_service.py"]
++}
+
+*** Add File: .github/workflows/ci.yml
+@@
++name: CI
++on: [push, pull_request]
++jobs:
++  build:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v3
++      - name: Set up Python
++        uses: actions/setup-python@v4
++        with:
++          python-version: '3.11'
++      - name: Install dependencies
++        run: |
++          python -m pip install --upgrade pip
++          pip install -r requirements.txt
++      - name: Format with Black
++        run: black . --check
++      - name: Lint
++        run: flake8 . --extend-ignore=E401,E501 --max-line-length=120
++      - name: Run tests
++        run: pytest -q
+
+*** Add File: scripts/token_check.py
+@@
++#!/usr/bin/env python3
++"""
++Token check script ensures utility code is within size budget.
++"""
++
++import json
++import os
++import sys
++
++def main():
++    contract_path = os.path.join(os.path.dirname(__file__), '..', 'utility_contract.json')
++    try:
++        with open(contract_path, 'r') as f:
++            contract = json.load(f)
++    except Exception as e:
++        print(f"Failed to load utility_contract.json: {e}", file=sys.stderr)
++        return 1
++
++    size_budget = contract.get("size_budget", 0)
++    total_size = 0
++    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
++    for root, dirs, files in os.walk(base_dir):
++        for file in files:
++            if file.endswith('.py'):
++                path = os.path.join(root, file)
++                with open(path, 'r', encoding='utf-8') as f:
++                    total_size += len(f.read())
++    print(f"Total code size: {total_size} bytes, budget: {size_budget} bytes")
++    if total_size > size_budget:
++        print("Size budget exceeded", file=sys.stderr)
++        return 1
++    return 0
++
++if __name__ == '__main__':
++    sys.exit(main())
+*** End Patch

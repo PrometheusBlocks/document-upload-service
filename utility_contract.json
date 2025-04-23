@@ -1,11 +1,22 @@
 {
-    "name": "REPLACE_ME",
-    "version": "0.0.0",
-    "language": "python",
-    "description": "Replace with one-sentence purpose.",
-    "size_budget": 200000,
-    "entrypoints": [],
-    "deps": [],
-    "tests": []
-  }
-  
+  "name": "document-upload-service",
+  "version": "0.1.0",
+  "language": "python",
+  "description": "Generic upload + OCR utility producing ExtractedDocument JSON.",
+  "size_budget": 200000,
+  "entrypoints": [
+    {
+      "name": "process_document",
+      "description": "Ingest file, OCR, return text pages",
+      "parameters_schema": {},
+      "return_schema": {}
+    }
+  ],
+  "deps": [
+    {"package": "pydantic", "version": ">=2.6"},
+    {"package": "pdf2image", "version": ">=1.17"},
+    {"package": "pillow", "version": ">=10"},
+    {"package": "pytesseract", "version": ">=0.3.10"}
+  ],
+  "tests": ["tests/test_service.py"]
+}
