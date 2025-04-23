@@ -1,7 +1,10 @@
 import base64
 import json
 from service.core import process_document
+
 SAMPLE_PDF_B64 = "JVBERi0xLjAKJUVPRgo="
+
+
 def test_process_document(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     user_id = "testuser"

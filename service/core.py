@@ -6,9 +6,12 @@ from pdf2image import convert_from_bytes
 from PIL import Image
 from ocr.adapter import get_adapter
 from models.extracted_document import ExtractedDocument, Page
+
+
 def _detect_extension(file_bytes: bytes) -> str:
     try:
         import magic
+
         mime = magic.from_buffer(file_bytes, mime=True)
         if mime == "application/pdf":
             return "pdf"
@@ -22,6 +25,8 @@ def _detect_extension(file_bytes: bytes) -> str:
     except Exception:
         pass
     return "pdf"
+
+
 def process_document(file_bytes: bytes, user_id: str) -> ExtractedDocument:
     document_id = str(uuid.uuid4())
     ext = _detect_extension(file_bytes)
@@ -47,7 +52,9 @@ def process_document(file_bytes: bytes, user_id: str) -> ExtractedDocument:
     os.makedirs(extracted_dir, exist_ok=True)
     extracted_filename = f"{document_id}.json"
     extracted_path = os.path.join(extracted_dir, extracted_filename)
-    doc = ExtractedDocument(document_id=document_id, user_id=user_id, original_path=raw_path, pages=pages)
+    doc = ExtractedDocument(
+        document_id=document_id, user_id=user_id, original_path=raw_path, pages=pages
+    )
     with open(extracted_path, "w", encoding="utf-8") as f:
         json.dump(doc.model_dump(), f, ensure_ascii=False)
     return doc
