@@ -39,11 +39,6 @@ class LLMVisionAdapter:
         self.openai = openai
 
     def extract_text(self, image: Image.Image) -> str:
-        import io
-
-        buffered = io.BytesIO()
-        image.save(buffered, format="PNG")
-        img_bytes = buffered.getvalue()
         response = self.openai.ChatCompletion.create(
             model="gpt-4o",
             messages=[
