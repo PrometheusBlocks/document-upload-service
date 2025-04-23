@@ -1,0 +1,11 @@
+{
+    "name": "REPLACE_ME",
+    "version": "0.0.0",
+    "language": "python",
+    "description": "Replace with one-sentence purpose.",
+    "size_budget": 200000,
+    "entrypoints": [],
+    "deps": [],
+    "tests": []
+  }
+  
